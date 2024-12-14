@@ -1,0 +1,2 @@
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Release\net8.0\win-x64\publish\RPToolkid.pdb
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Release\net8.0\win-x64\publish\RPToolkid.exe

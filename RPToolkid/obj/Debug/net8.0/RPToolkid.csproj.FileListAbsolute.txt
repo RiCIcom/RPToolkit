@@ -1,0 +1,14 @@
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.AssemblyInfoInputs.cache
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.AssemblyInfo.cs
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.csproj.CoreCompileInputs.cache
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Debug\net8.0\RPToolkid.exe
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Debug\net8.0\RPToolkid.deps.json
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Debug\net8.0\RPToolkid.runtimeconfig.json
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Debug\net8.0\RPToolkid.dll
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\bin\Debug\net8.0\RPToolkid.pdb
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.dll
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\refint\RPToolkid.dll
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.pdb
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\RPToolkid.genruntimeconfig.cache
+C:\Users\r3150\source\repos\RPToolkid\RPToolkid\obj\Debug\net8.0\ref\RPToolkid.dll
