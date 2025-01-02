@@ -1,12 +1,10 @@
-﻿using RPToolkid.myutils;
-
-namespace RPToolkid.src
+﻿namespace RPToolkid.src
 {
     public static class UI
     {
         public static void DisplayHeader()
         {
-            Mycstools.SetColor("Magenta");
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("  _____  _____    _______ ____   ____  _      _  _______ _______ \r\n" +
                               " |  __ \\|  __ \\  |__   __/ __ \\ / __ \\| |    | |/ /_   _|__   __|\r\n" +
                               " | |__) | |__) |    | | | |  | | |  | | |    | ' /  | |    | |   \r\n" +

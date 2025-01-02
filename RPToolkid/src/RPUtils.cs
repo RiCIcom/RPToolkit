@@ -13,32 +13,34 @@ namespace RPToolkid.src
 
         public static bool IsFiveMRunning() => Process.GetProcessesByName("FiveM").Length > 0;
 
-        public static void EnsureFiveMNotRunning()
+        //UPDATED (Timeout for bether Performance)!
+        public static void EnsureFiveMNotRunning(int timeoutInSeconds = 300)
         {
+            var startTime = DateTime.Now;
             while (IsFiveMRunning())
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[WARNUNG] FiveM läuft derzeit. Bitte schließen Sie FiveM, um fortzufahren.");
-                Console.ResetColor();
-                Console.WriteLine("Warten auf das Schließen von FiveM...");
+                if ((DateTime.Now - startTime).TotalSeconds > timeoutInSeconds)
+                {
+                    Logger.LogError("Timeout: FiveM wurde nicht rechtzeitig geschlossen.");
+                    return;
+                }
+                Logger.LogInfo("FiveM läuft noch. Bitte schließen.");
                 Thread.Sleep(3000);
             }
-            Console.WriteLine("[INFO] FiveM ist geschlossen. Sie können jetzt fortfahren.");
+            Logger.LogInfo("FiveM ist geschlossen.");
         }
 
         public static void ClearCache()
         {
-            if (!ConfirmAction("Sind Sie sicher, dass Sie den Cache löschen möchten? (y/n)"))
+            if (!ConfirmAction("Sind Sie sicher, dass Sie den Cache löschen möchten? (Y/N)"))
             {
-                Console.WriteLine("[INFO] Abgebrochen. Der Cache wurde nicht gelöscht.");
+                Logger.LogInfo("Abgebrochen. Der Cache wurde nicht gelöscht.");
                 return;
             }
 
             if (!Directory.Exists(FiveMPath))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Der FiveM-Ordner wurde nicht gefunden: {FiveMPath}");
-                Console.ResetColor();
+                Logger.LogError($"[ERROR] Der FiveM-Ordner wurde nicht gefunden: {FiveMPath}");
                 return;
             }
 
@@ -54,9 +56,7 @@ namespace RPToolkid.src
                 TryDeleteAndRecreate(path);
             }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\n[SUCCESS] Cache wurde erfolgreich gelöscht!");
-            Console.ResetColor();
+            Logger.LogSuccess("Cache wurde erfolgreich gelöscht!");
         }
 
         public static async Task ReinstallFiveM()
@@ -69,7 +69,7 @@ namespace RPToolkid.src
 
             if (!ConfirmAction(null))
             {
-                Console.WriteLine("\n[INFO] Installation abgebrochen.");
+                Logger.LogInfo("Installation abgebrochen.");
                 return;
             }
 
@@ -82,11 +82,11 @@ namespace RPToolkid.src
         {
             if (!Directory.Exists(FiveMPath))
             {
-                Console.WriteLine("\n[INFO] Der FiveM-Ordner wurde nicht gefunden.");
+                Logger.LogError("Der FiveM-Ordner wurde nicht gefunden.");
                 return;
             }
 
-            Console.WriteLine("\n[INFO] Lösche den alten FiveM-Ordner...");
+            Logger.LogInfo("Lösche den alten FiveM-Ordner...");
 
             try
             {
@@ -95,16 +95,11 @@ namespace RPToolkid.src
                     DeleteDirectoryContents(FiveMPath);
                     Directory.Delete(FiveMPath, true);
                 });
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[SUCCESS] Der FiveM-Ordner wurde erfolgreich gelöscht.");
-                Console.ResetColor();
+                Logger.LogSuccess("[SUCCESS] Der FiveM-Ordner wurde erfolgreich gelöscht.");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Fehler beim Löschen des FiveM-Ordners: {ex.Message}");
-                Console.ResetColor();
+                Logger.LogError($"[ERROR] Fehler beim Löschen des FiveM-Ordners: {ex.Message}");
             }
         }
 
@@ -119,7 +114,7 @@ namespace RPToolkid.src
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[ERROR] Fehler beim Löschen der Datei {file}: {ex.Message}");
+                    Logger.LogError($"[ERROR] Fehler beim Löschen der Datei {file}: {ex.Message}");
                 }
             }
 
@@ -132,7 +127,7 @@ namespace RPToolkid.src
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[ERROR] Fehler beim Löschen des Verzeichnisses {dir}: {ex.Message}");
+                    Logger.LogError($"[ERROR] Fehler beim Löschen des Verzeichnisses {dir}: {ex.Message}");
                 }
             }
         }
@@ -141,23 +136,21 @@ namespace RPToolkid.src
         {
             if (File.Exists(FiveMExe))
             {
-                Console.WriteLine("\n[INFO] FiveM.exe wurde bereits heruntergeladen.");
+                Logger.LogInfo("FiveM.exe wurde bereits heruntergeladen.");
                 return;
             }
 
-            Console.WriteLine("\n[INFO] Lade FiveM.exe herunter...");
+            Logger.LogInfo("Lade FiveM.exe herunter...");
             using (WebClient client = new WebClient())
             {
                 try
                 {
                     await client.DownloadFileTaskAsync(new Uri(FiveMUrl), FiveMExe);
-                    Console.WriteLine("[SUCCESS] Download abgeschlossen.");
+                    Logger.LogInfo("[SUCCESS] Download abgeschlossen.");
                 }
                 catch (Exception ex)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"[ERROR] Fehler beim Herunterladen von FiveM.exe: {ex.Message}");
-                    Console.ResetColor();
+                    Logger.LogError($"Fehler beim Herunterladen von FiveM.exe: {ex.Message}");
                     Environment.Exit(1);
                 }
             }
@@ -167,13 +160,11 @@ namespace RPToolkid.src
         {
             if (!File.Exists(FiveMExe))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[ERROR] FiveM.exe konnte nicht gefunden werden.");
-                Console.ResetColor();
+                Logger.LogError("FiveM.exe konnte nicht gefunden werden.");
                 return;
             }
 
-            Console.WriteLine("\n[INFO] Starte die FiveM-Installation...");
+            Logger.LogInfo("Starte die FiveM-Installation...");
             try
             {
                 Process.Start(new ProcessStartInfo
@@ -181,21 +172,30 @@ namespace RPToolkid.src
                     FileName = FiveMExe,
                     UseShellExecute = true
                 });
-                Console.WriteLine("[SUCCESS] FiveM-Installation gestartet.");
+                Logger.LogSuccess("FiveM-Installation gestartet.");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Fehler beim Starten der FiveM-Installation: {ex.Message}");
-                Console.ResetColor();
+                Logger.LogError($"Fehler beim Starten der FiveM-Installation: {ex.Message}");
             }
         }
 
-        private static bool ConfirmAction(string message)
+        //UPDATED! Performance fix!
+        public static bool ConfirmAction(string message, int timeoutSeconds = 30)
         {
-            if (message != null) Console.WriteLine(message);
-            string input = Console.ReadLine()?.Trim().ToLower();
-            return input == "y";
+            if (!string.IsNullOrEmpty(message)) Logger.LogInfo(message);
+
+            DateTime start = DateTime.Now;
+            while ((DateTime.Now - start).TotalSeconds < timeoutSeconds)
+            {
+                string input = Console.ReadLine()?.Trim().ToLower();
+                if (input == "y") return true;
+                if (input == "n") return false;
+                Logger.LogWarning("Ungültige Eingabe. Bitte 'Y' oder 'N' eingeben.");
+            }
+
+            Logger.LogWarning("Timeout erreicht. Standardantwort: 'Nein'.");
+            return false;
         }
 
         private static void TryDeleteAndRecreate(string path)
@@ -205,17 +205,15 @@ namespace RPToolkid.src
                 if (Directory.Exists(path))
                 {
                     Directory.Delete(path, true);
-                    Console.WriteLine($"[INFO] Gelöscht: {path}");
+                    Logger.LogInfo($"Gelöscht: {path}");
                 }
 
                 Directory.CreateDirectory(path);
-                Console.WriteLine($"[INFO] Neu erstellt: {path}");
+                Logger.LogInfo($"Neu erstellt: {path}");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Fehler bei {path}: {ex.Message}");
-                Console.ResetColor();
+                Logger.LogError($"Fehler bei {path}: {ex.Message}");
             }
         }
 
@@ -225,7 +223,7 @@ namespace RPToolkid.src
 
             if (!File.Exists(configPath))
             {
-                Mycstools.LogMessage("[ERROR] CitizenFX.ini konnte nicht gefunden werden.", ConsoleColor.Red);
+                Logger.LogError("CitizenFX.ini konnte nicht gefunden werden.");
                 return;
             }
 
@@ -258,11 +256,11 @@ namespace RPToolkid.src
                 }
 
                 File.Replace(tempPath, configPath, null);
-                Mycstools.LogMessage($"[SUCCESS] {key} wurde auf {value} gesetzt.", ConsoleColor.Green);
+                Logger.LogSuccess($"{key} wurde auf {value} gesetzt.");
             }
             catch (Exception ex)
             {
-                Mycstools.LogMessage($"[ERROR] Fehler beim Aktualisieren der Einstellungen: {ex.Message}", ConsoleColor.Red);
+                Logger.LogError($"Fehler beim Aktualisieren der Einstellungen: {ex.Message}");
             }
             finally
             {
@@ -276,13 +274,11 @@ namespace RPToolkid.src
 
             if (!File.Exists(configPath))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[ERROR] CitizenFX.ini konnte nicht gefunden werden.");
-                Console.ResetColor();
+                Logger.LogError("CitizenFX.ini konnte nicht gefunden werden.");
                 return;
             }
 
-            Console.WriteLine("\n[INFO] Aktuelle Einstellungen in CitizenFX.ini:");
+           Logger.LogInfo("Aktuelle Einstellungen in CitizenFX.ini:");
             string[] lines = File.ReadAllLines(configPath);
             foreach (string line in lines)
             {
@@ -296,23 +292,19 @@ namespace RPToolkid.src
 
             if (!File.Exists(fiveMPath))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[ERROR] FiveM.exe konnte nicht gefunden werden.");
-                Console.ResetColor();
+                Logger.LogError("FiveM.exe konnte nicht gefunden werden.");
                 return;
             }
 
-            Console.WriteLine("\n[INFO] Überprüfe, ob FiveM bereits läuft...");
+            Logger.LogInfo("Überprüfe, ob FiveM bereits läuft...");
 
             if (Process.GetProcessesByName("FiveM").Length > 0)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("[INFO] FiveM läuft bereits!");
-                Console.ResetColor();
+                Logger.LogInfo("FiveM läuft bereits!");
                 return;
             }
 
-            Console.WriteLine("[INFO] Starte FiveM...");
+            Logger.LogInfo("Starte FiveM...");
 
             try
             {
@@ -321,13 +313,11 @@ namespace RPToolkid.src
                     FileName = fiveMPath,
                     UseShellExecute = true
                 });
-                Console.WriteLine("[SUCCESS] FiveM wurde gestartet.");
+                Logger.LogSuccess("FiveM wurde gestartet.");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Fehler beim Starten von FiveM: {ex.Message}");
-                Console.ResetColor();
+                Logger.LogError($"[ERROR] Fehler beim Starten von FiveM: {ex.Message}");
             }
         }
     }
